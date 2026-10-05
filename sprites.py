@@ -63,8 +63,8 @@ class Player(Sprite):
         self.last_update = 0
         self.jumping = False
         self.moving = False
-        self.load_images
         print("player instance created")
+        self.load_images()
     # gets player input
     def get_keys(self):
         self.vel = vec(0,0)
@@ -89,11 +89,12 @@ class Player(Sprite):
     def animate(self):
         now = pg.time.get_ticks()
         if not self.jumping and not self.moving:
+            # this determines when to display the next frame
             if now - self.last_update > 350:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
                 bottom = self.rect.bottom
-                self.image = self.standing_frames[self.current_frame]
+                self.image = self.idle_frames[self.current_frame]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
         elif self.moving:
