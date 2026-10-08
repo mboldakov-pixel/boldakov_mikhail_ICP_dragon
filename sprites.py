@@ -44,6 +44,7 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
         self.game = game
+        #this provides us with raster images for use in animation or otherwise
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
@@ -59,8 +60,10 @@ class Player(Sprite):
         # self.y = y * TILESIZE
         self.hit_rect = PLAYER_HIT_RECT
         # animation stuff
+        #start with current frames and last update at zero so we can cycle through animations
         self.current_frame = 0
         self.last_update = 0
+        # accounting for the status pf the player
         self.jumping = False
         self.moving = False
         print("player instance created")
