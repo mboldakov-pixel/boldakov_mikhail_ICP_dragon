@@ -24,7 +24,7 @@ from utils import *
 
 # the game class a blueprint for the whole game...
 class Game:
-    # 
+    
     def __init__(self):
         pg.init()
         pg.mixer.init()
@@ -81,6 +81,8 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'C':
                     Coin(self, col, row)
+                if tile == 'I':
+                    Tile(self, )
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'P':
