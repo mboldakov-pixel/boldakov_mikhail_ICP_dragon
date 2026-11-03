@@ -9,8 +9,8 @@ Process - input processed (direction of control, magnitude)
 Output - Draw new frames pixels, sound, haptics (senses)
 (Store)
 
-GOALS: Collect Coins, and evade enemies
-RULES: time limit
+GOALS: Collect All Coins
+RULES: time limit, die after touching enemies
 FEEDBACK: Damage taken from dragons,maybe if there are enough dragons touching the character you have to restart.
 FREEDOM: Can't go into walls, shoot fire 
 '''
