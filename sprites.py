@@ -149,7 +149,7 @@ class Player(Sprite):
             self.game.pickup_snd.play()
             for i in range(100):
                 #print(f"I have {self.coins} coins")
-                Particle(self.game, hits[0].rect.x, hits[0].rect.y)
+                Particle(self.game, hits[0].rect.x, hits[0].rect.y, GREEN)
                 hits[0].kill()
                 print(str(len(self.game.all_particles)))
 
@@ -236,10 +236,10 @@ class Particle(Sprite):
         self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.vel = vec(0,0)
+        self.vel = vec(randint(-180, 180), randint(-180, 180))
         self.pos = vec(x,y)
         self.rect.center = self.pos
-        self.speed = 12
+        self.speed = 2
         self.countdown = Cooldown()
         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
         print("I created a particle")
@@ -248,11 +248,12 @@ class Particle(Sprite):
 
     def update(self):
         self.countdown.ticking()
-        self.rect.x += self.speed*randint(-3,3)
-        self.rect.y += self.speed*randint(-3,3)
+        self.pos += self.vel * self.speed * self.game.dt
         if self.countdown.delta > 1:
             self.kill()
             print(str(len(self.game.all_particles)))
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
         
 
 class Wall(Sprite):
