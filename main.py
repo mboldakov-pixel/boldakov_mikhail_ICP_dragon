@@ -9,7 +9,7 @@ Process - input processed (direction of control, magnitude)
 Output - Draw new frames pixels, sound, haptics (senses)
 (Store)
 
-GOALS: Collect All Coins
+GOALS: Collect All Eggs
 RULES: time limit, die after touching enemies
 FEEDBACK: Damage taken from dragons,maybe if there are enough dragons touching the character you have to restart.
 FREEDOM: Can't go into walls, shoot fire 
@@ -82,7 +82,8 @@ class Game:
                 if tile == 'C':
                     Coin(self, col, row)
                 if tile == 'I':
-                    Tile(self, )
+                    f = FloorTile(self, col, row, CYAN)
+                    f.variant = "ice"
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'P':
@@ -100,8 +101,8 @@ class Game:
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                with open(path.join(self.game_dir, self.game_save_file), 'w') as f:
-                    if self.highscore < self.score:
+                if self.score > self.highscore:
+                    with open(path.join(self.game_dir, self.game_save_file), 'w') as f:
                         f.write(str(self.score))
                 if self.playing:
                     self.playing = False

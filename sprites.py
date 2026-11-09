@@ -55,9 +55,11 @@ class Player(Sprite):
         self.rect = self.image.get_rect()
         # self.vx, self.vy = 0,0
         #Acceleration for chaning velocity
+        #Essential for Movement
         self.acc = vec(0,0)
         self.vel = vec(0,0)
         self.pos = vec(x,y) * TILESIZE
+        self.cofric = PLAYER_FRIC
         self.hit_rect = PLAYER_HIT_RECT
         # animation stuff
         #start with current frames and last update at zero so we can cycle through animations
@@ -71,25 +73,16 @@ class Player(Sprite):
         self.load_images()
     # gets player input
     def get_keys(self):
-        #self.vel = vec(0,0)
-        # self.vx, self.vy = 0,0
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
-            # self.vx = -PLAYER_SPEED
-            #self.vel.x = -PLAYER_SPEED
-            self.acc.x = -5
+            self.acc.x = -PLAYER_ACC
         if keys[pg.K_d]:
-            # self.vx = PLAYER_SPEED
-            #self.vel.x = PLAYER_SPEED
-            self.acc.x = 5
+            self.acc.x = PLAYER_ACC
         if keys[pg.K_w]:
-            # self.vy = -PLAYER_SPEED
-            #self.vel.y = -PLAYER_SPEED
-            self.acc.y = -5
+            self.acc.y = -PLAYER_ACC
         if keys[pg.K_s]:
-            # self.vy = PLAYER_SPEED
-            #self.vel.y = PLAYER_SPEED
-            self.acc.x = 5
+            self.acc.y = PLAYER_ACC
+        #dont know of this code is necessary
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
         
@@ -118,23 +111,37 @@ class Player(Sprite):
                 self.rect.bottom = bottom
             
     def update(self):
+        self.animate()
         #physics/acceleration math done here
         # (0,9.8) - if side scroller
         self.acc = vec(0,0)
         self.get_keys()
-        tile_hits = pg.sprite.spritecollode(self, self.game.all_tiles, False)
+        self.acc.x += self.vel.x * self.cofric
+        
+        self.acc.y += self.vel.y * self.cofric
+        self.vel += self.acc
+        # limit the maximum fall speed to prevent tunneling through tiles
+        # prompted ai to prevent tunneling through tiles
+        max_fall_speed = TILESIZE / max(self.game.dt, 0.001)
+        self.vel.y = min(self.vel.y, max_fall_speed)
+        # if abs(self.vel.x) < 0.1:
+        #     self.vel.x = 0
+        # if abs(self.vel.y) < 0.1:
+        #     self.vel.y = 0
+        # update position based on velocity and acceleration
+        # used exponential calculation with game.dt to update position accurately
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * (self.game.dt ** 2)
+        tile_hits = pg.sprite.spritecollide(self, self.game.all_tiles, False)
         if tile_hits:
             if tile_hits[0].variant == "ice":
-                self.cofric = -0.001
+                self.cofric = -.001
             else:
-                self.cofric = -0.1
-        self.acc.x += self.vel.x*PLAYER_FRIC
-        self.acc.y += self.vel.y*PLAYER_FRIC
-        self.vel +=self.acc
+                self.cofric = -.01
+        # else:
+        #     self.acc = vec(0,0)
+        print(self.vel)
+
         self.rect.center = self.pos
-        #self.pos += self.vel * self.game.dt
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc
-    
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
             self.coins+= 1
@@ -260,6 +267,19 @@ class Wall(Sprite):
         self.pos = vec(x,y) * TILESIZE
         self.rect.center = self.pos
 
+class FloorTile(Sprite):
+    def __init__(self, game, x, y, color):
+        self.groups = game.all_sprites, game.all_tiles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.vel = vec(0,0) 
+        self.pos = vec(x,y) * TILESIZE
+        self.rect.center = self.pos
+        self.variant = ""
+
 class Coin(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_coins
@@ -273,18 +293,5 @@ class Coin(Sprite):
         self.vel = vec(0,0)
         self.pos = vec(x,y) *TILESIZE
         self.rect.center = self.pos
-
-class Tile(Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.all_tiles
-        Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-        self.vel = vec(0,0)
-        self.pos = vec(x,y) * TILESIZE
-        self.rect.center = self.pos
-        self.variant = 
 
     # new object type Wall that is green
