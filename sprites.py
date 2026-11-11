@@ -287,6 +287,7 @@ class Coin(Sprite):
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
+        #creating a circle with golden color to resemble coin
         pg.draw.circle(self.image,GOLD, (TILESIZE/2,TILESIZE/2), TILESIZE/2)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
