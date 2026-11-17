@@ -2,6 +2,7 @@ import pygame as pg
 from settings import *
 from math import floor
 
+
 class Map:
     def __init__(self, filename):
         self.data = []

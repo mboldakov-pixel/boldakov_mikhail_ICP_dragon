@@ -21,10 +21,10 @@ def collide_with_walls(sprite, group, dir):
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
             # this line checks to see if we're to the left of the wall
-            if hits[0].rect.centerx > sprite.hit_rect.centerx:
+            if sprite.vel.x > 0:
                 # reposition the player (sprite) to the left side of the wall
                 sprite.pos.x = hits[0].rect.left - sprite.hit_rect.width / 2
-            if hits[0].rect.centerx < sprite.hit_rect.centerx:
+            if sprite.vel.x < 0:
                 sprite.pos.x = hits[0].rect.right + sprite.hit_rect.width / 2 
             sprite.vel.x = 0
             sprite.hit_rect.centerx = sprite.pos.x
@@ -33,10 +33,10 @@ def collide_with_walls(sprite, group, dir):
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
             # this line checks to see if we're above the wall
-            if hits[0].rect.centery > sprite.hit_rect.centery:
+            if sprite.vel.y > 0:
                 # reposition the player (sprite) to the top of the wall
                 sprite.pos.y = hits[0].rect.top - sprite.hit_rect.height / 2
-            if hits[0].rect.centery < sprite.hit_rect.centery:
+            if sprite.vel.y < 0:
                 sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.height / 2 
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
@@ -85,9 +85,14 @@ class Player(Sprite):
         #dont know of this code is necessary
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
-        
+        if keys[pg.K_f]:
+            self.pew()
+
     def jump(self):
         pass
+    def pew(self):
+        PewPew(self.game, self.hit_rect.centerx, self.hit_rect.centery, TILESIZE/4, TILESIZE/4, 0, -10)
+
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0,0, TILESIZE,TILESIZE), self.spritesheet.get_image(32,0, TILESIZE,TILESIZE)]
     def animate(self):
@@ -158,6 +163,28 @@ class Player(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
+
+class PewPew(Sprite):
+    def __init__(self, game, x, y, w, h, sx, sy):
+        self.groups = game.all_sprites, game.all_pews
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((w,h))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = TILESIZE/4
+        pg.draw.circle(self.image, YELLOW, self.rect.center, self.radius)
+        self.rect.x = x
+        self.rect.y = y
+        self.speed_x = sx 
+        self.speed_y = sy 
+        self.fired = False
+
+    def update(self):
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+        if self.rect.y < 0 or self.rect.y > HEIGHT:
+            self.kill()
         
 class Mob(Sprite):
     def __init__(self, game, x, y):
